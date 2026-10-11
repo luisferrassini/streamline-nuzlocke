@@ -258,6 +258,17 @@
 
 #define ADVPATH_ROOM_COUNT              16
 
+// Conexoes entre salas do caminho
+//
+#define ROOM_CONNECTION_TOP     0
+#define ROOM_CONNECTION_MID     1
+#define ROOM_CONNECTION_BOT     2
+#define ROOM_CONNECTION_COUNT   3
+
+#define ROOM_CONNECTION_MASK_TOP     (1 << ROOM_CONNECTION_TOP)
+#define ROOM_CONNECTION_MASK_MID     (1 << ROOM_CONNECTION_MID)
+#define ROOM_CONNECTION_MASK_BOT     (1 << ROOM_CONNECTION_BOT)
+
 
 #define ADVPATH_SUBROOM_ROUTE_CALM          0
 #define ADVPATH_SUBROOM_ROUTE_AVERAGE       1

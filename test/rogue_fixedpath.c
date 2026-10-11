@@ -1,0 +1,43 @@
+#include "global.h"
+#include "test/test.h"
+#include "rogue.h"
+#include "rogue_fixedpath.h"
+
+static const struct FixedPathStep sSteps[] =
+{
+    // param != extra de propósito: pega o bug da união (ver o teste)
+    { ADVPATH_ROOM_ROUTE, 5,  7 },
+    { ADVPATH_ROOM_ROUTE, 1,  0 },
+    { ADVPATH_ROOM_BOSS,  0,  42 },
+};
+
+TEST("RogueFixed_BuildPath makes a straight line")
+{
+    struct RogueAdvPath path;
+
+    RogueFixed_BuildPath(sSteps, ARRAY_COUNT(sSteps), &path);
+
+    EXPECT_EQ(path.roomCount, 3);
+    EXPECT_EQ(path.pathLength, 3);
+    EXPECT_EQ(path.pathMinY, 0);
+    EXPECT_EQ(path.pathMaxY, 0);
+
+    EXPECT_EQ(path.rooms[0].coords.x, 0);
+    EXPECT_EQ(path.rooms[0].coords.y, 0);
+    EXPECT_EQ(path.rooms[1].coords.x, 1);
+    EXPECT_EQ(path.rooms[2].coords.x, 2);
+
+    EXPECT_EQ(path.rooms[0].roomType, ADVPATH_ROOM_ROUTE);
+    EXPECT_EQ(path.rooms[2].roomType, ADVPATH_ROOM_BOSS);
+
+    EXPECT(path.rooms[0].connectionMask & ROOM_CONNECTION_MASK_MID);
+    EXPECT(path.rooms[1].connectionMask & ROOM_CONNECTION_MASK_MID);
+    EXPECT_EQ(path.rooms[2].connectionMask, 0);
+
+    EXPECT_EQ(path.rooms[0].rngSeed, 0);
+
+    // perType é uma união: só o campo do tipo da sala conta.
+    EXPECT_EQ(path.rooms[0].roomParams.perType.route.difficulty, 5);
+    EXPECT_EQ(path.rooms[1].roomParams.perType.route.difficulty, 1);
+    EXPECT_EQ(path.rooms[2].roomParams.perType.boss.trainerNum, 42);
+}
