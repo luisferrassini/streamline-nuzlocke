@@ -50,7 +50,7 @@ Coisas que o desenho implica mas nenhum teste cobre, em ordem de risco:
 
 ---
 
-## Tarefa 1: Build reproduzível
+## Task 1: Build reproduzível
 
 **Arquivos:**
 - Modificar: `tools/mapjson/Makefile`
@@ -114,7 +114,7 @@ git commit -m "build: ambiente reproduzivel (agbcc, poryscript, mapjson gcc16)"
 
 ---
 
-## Tarefa 2: Núcleo puro do caminho fixo
+## Task 2: Núcleo puro do caminho fixo
 
 **Arquivos:**
 - Criar: `include/rogue_fixedpath.h`
@@ -142,9 +142,10 @@ Criar `test/rogue_fixedpath.c`:
 
 static const struct FixedPathStep sSteps[] =
 {
-    { ADVPATH_ROOM_ROUTE, 0, 0 },
-    { ADVPATH_ROOM_ROUTE, 1, 0 },
-    { ADVPATH_ROOM_BOSS,  0, 0 },
+    // param != extra de propósito: pega o bug da união (ver o teste)
+    { ADVPATH_ROOM_ROUTE, 5,  7 },
+    { ADVPATH_ROOM_ROUTE, 1,  0 },
+    { ADVPATH_ROOM_BOSS,  0,  42 },
 };
 
 TEST("RogueFixed_BuildPath makes a straight line")
@@ -171,6 +172,11 @@ TEST("RogueFixed_BuildPath makes a straight line")
     EXPECT_EQ(path.rooms[2].connectionMask, 0);
 
     EXPECT_EQ(path.rooms[0].rngSeed, 0);
+
+    // perType é uma união: só o campo do tipo da sala conta.
+    EXPECT_EQ(path.rooms[0].roomParams.perType.route.difficulty, 5);
+    EXPECT_EQ(path.rooms[1].roomParams.perType.route.difficulty, 1);
+    EXPECT_EQ(path.rooms[2].roomParams.perType.boss.trainerNum, 42);
 }
 ```
 
@@ -182,14 +188,35 @@ MODERN=1 make check TESTS="RogueFixed_BuildPath"
 
 Esperado: falha de compilação (`rogue_fixedpath.h` não existe) ou link.
 
-- [ ] **Etapa 3: Criar o header**
+- [ ] **Etapa 3: Mover as constantes de conexão e criar o header**
 
-Criar `include/rogue_fixedpath.h`:
+As máscaras de conexão (`ROOM_CONNECTION_MASK_*`) hoje são `#define` locais no
+fim de `src/rogue_adventurepaths.c` (linhas 47-56). O nosso arquivo também
+precisa delas. Mover para `include/constants/rogue.h`.
+
+Em `src/rogue_adventurepaths.c`, remover este bloco:
+
+```c
+#define ROOM_CONNECTION_TOP     0
+#define ROOM_CONNECTION_MID     1
+#define ROOM_CONNECTION_BOT     2
+#define ROOM_CONNECTION_COUNT   3
+
+#define ROOM_CONNECTION_MASK_TOP     (1 << ROOM_CONNECTION_TOP)
+#define ROOM_CONNECTION_MASK_MID     (1 << ROOM_CONNECTION_MID)
+#define ROOM_CONNECTION_MASK_BOT     (1 << ROOM_CONNECTION_BOT)
+```
+
+E adicionar o mesmo bloco em `include/constants/rogue.h`, perto dos outros
+`#define ADVPATH_*`.
+
+Depois, criar `include/rogue_fixedpath.h`:
 
 ```c
 #ifndef GUARD_ROGUE_FIXEDPATH_H
 #define GUARD_ROGUE_FIXEDPATH_H
 
+#include "global.h"
 #include "rogue.h"
 
 // Uma entrada do caminho fixo, vinda do arquivo de dados.
@@ -237,8 +264,12 @@ void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct R
         out->rooms[i].connectionMask = (i + 1 < count) ? ROOM_CONNECTION_MASK_MID : 0;
         out->rooms[i].rngSeed = 0;
         out->rooms[i].roomParams.roomIdx = i;
-        out->rooms[i].roomParams.perType.route.difficulty = steps[i].param;
-        out->rooms[i].roomParams.perType.boss.trainerNum = steps[i].extra;
+
+        // perType é uma união: escrever só o campo do tipo da sala.
+        if (steps[i].roomType == ADVPATH_ROOM_BOSS)
+            out->rooms[i].roomParams.perType.boss.trainerNum = steps[i].extra;
+        else
+            out->rooms[i].roomParams.perType.route.difficulty = steps[i].param;
     }
 }
 ```
@@ -260,7 +291,7 @@ git commit -m "feat: funcao pura que monta o caminho fixo"
 
 ---
 
-## Tarefa 3: Dados do caminho (JSON → header)
+## Task 3: Dados do caminho (JSON → header)
 
 **Arquivos:**
 - Criar: `src/data/rogue/hack_path.json`
@@ -269,7 +300,7 @@ git commit -m "feat: funcao pura que monta o caminho fixo"
 - Criar (gerado): `src/data/rogue/hack_path.h`
 
 **Interfaces:**
-- Consome: `struct FixedPathStep` (Tarefa 2), nomes de tipo de sala.
+- Consome: `struct FixedPathStep` (Task 2), nomes de tipo de sala.
 - Produz: `gHackPathSteps[]` e `HACK_PATH_STEP_COUNT` no header gerado.
 
 - [ ] **Etapa 1: Escrever os dados**
@@ -347,21 +378,29 @@ git commit -m "feat: dados do caminho e gerador de header"
 
 ---
 
-## Tarefa 4: Integrar no jogo
+## Task 4: Integrar no jogo
 
 **Arquivos:**
 - Modificar: `src/rogue_adventurepaths.c` (função
   `RogueAdv_GenerateAdventurePathsIfRequired`, perto da linha 1339)
 
 **Interfaces:**
-- Consome: `RogueFixed_BuildPath` (Tarefa 2), `gHackPathSteps` /
-  `HACK_PATH_STEP_COUNT` (Tarefa 3).
+- Consome: `RogueFixed_BuildPath` (Task 2), `gHackPathSteps` /
+  `HACK_PATH_STEP_COUNT` (Task 3).
 - Produz: um jogo que usa o caminho fixo.
 
 - [ ] **Etapa 1: Incluir o header gerado**
 
-No topo de `src/rogue_adventurepaths.c`, adicionar
-`#include "../data/rogue/hack_path.h"` (e `"rogue_fixedpath.h"` se preciso).
+No topo de `src/rogue_adventurepaths.c`, adicionar:
+
+```c
+#include "rogue_fixedpath.h"
+#include "data/rogue/hack_path.h"
+```
+
+O caminho `"data/rogue/hack_path.h"` é o padrão do repo (ver
+`src/rogue_gifts.c`, `src/rogue_hub.c`). Deixar no topo: o header gerado só usa
+constantes e `struct FixedPathStep`, então funciona antes da função.
 
 - [ ] **Etapa 2: Trocar a geração aleatória**
 
@@ -372,6 +411,11 @@ Na função `RogueAdv_GenerateAdventurePathsIfRequired`, trocar a chamada
 Rogue_ResetAdventurePathBuffers();
 RogueFixed_BuildPath(gHackPathSteps, HACK_PATH_STEP_COUNT, &gRogueAdvPath);
 ```
+
+Manter o resto da função como está. As funções de geração aleatória
+(`GeneratePath` e cia.) ficam sem uso. Isso gera avisos `-Wunused-function`,
+mas o build moderno tem `-Wno-error=unused-function`, então não quebra. A
+limpeza dessas funções fica para o Plano 5 (enxugar).
 
 - [ ] **Etapa 3: Compilar**
 
