@@ -14,6 +14,10 @@ ROOM_TYPES = {
     "boss": "ADVPATH_ROOM_BOSS",
 }
 
+# Precisa bater com ROGUE_ADVPATH_ROOM_CAPACITY em include/constants/rogue.h.
+# Um caminho maior que isto perderia a sala final (o chefe) no jogo.
+MAX_ROOMS = 32
+
 _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DEFAULT_JSON = os.path.join(_ROOT, "src", "data", "rogue", "hack_path.json")
 DEFAULT_HEADER = os.path.join(_ROOT, "src", "data", "rogue", "hack_path.h")
@@ -32,6 +36,9 @@ def parse(data):
             entries.append((ROOM_TYPES[rtype], 0, int(room.get("trainer", 0))))
         else:
             entries.append((ROOM_TYPES[rtype], int(room.get("difficulty", 0)), 0))
+    if len(entries) > MAX_ROOMS:
+        raise ValueError("caminho com %d salas; o limite e %d (ROGUE_ADVPATH_ROOM_CAPACITY)"
+                         % (len(entries), MAX_ROOMS))
     return entries
 
 

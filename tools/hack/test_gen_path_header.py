@@ -68,6 +68,23 @@ def main():
     check("default header sob a raiz",
           os.path.abspath(gen_path_header.DEFAULT_HEADER) == os.path.join(repo_root, "src", "data", "rogue", "hack_path.h"))
 
+    # Um caminho maior que MAX_ROOMS deve falhar alto, nao cortar em silencio.
+    limit_ok = {"version": 1,
+                "rooms": [{"type": "route", "difficulty": 0}] * gen_path_header.MAX_ROOMS}
+    try:
+        gen_path_header.parse(limit_ok)
+        check("aceita exatamente MAX_ROOMS", True)
+    except ValueError:
+        check("aceita exatamente MAX_ROOMS", False)
+
+    too_big = {"version": 1,
+               "rooms": [{"type": "route", "difficulty": 0}] * (gen_path_header.MAX_ROOMS + 1)}
+    try:
+        gen_path_header.parse(too_big)
+        check("recusa caminho acima de MAX_ROOMS", False)
+    except ValueError:
+        check("recusa caminho acima de MAX_ROOMS", True)
+
     if failures:
         print("FALHAS: %d" % failures)
         return 1
