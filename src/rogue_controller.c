@@ -56,6 +56,8 @@
 #include "trainer_card.h"
 
 #include "rogue.h"
+#include "rogue_fixedpath.h"
+#include "data/rogue/hack_path.h"
 #include "rogue_assistant.h"
 #include "rogue_automation.h"
 #include "rogue_adventurepaths.h"
@@ -9639,48 +9641,16 @@ static void EndWildEncounterQuery()
 
 static void RandomiseWildEncounters(void)
 {
-    BeginWildEncounterQuery();
-    {
-        u8 i;
-        u8 typeHint = Rogue_GetTypeForHintForRoom(&gRogueAdvPath.rooms[gRogueRun.adventureRoomId]);
-        RogueWeightQuery_Begin();
+    struct RogueAdvPathRoom *room = &gRogueAdvPath.rooms[gRogueRun.adventureRoomId];
+    const struct FixedPathRoomEncounters *enc = NULL;
 
-        // Initial query will only allow mons of type hint
-        RogueWeightQuery_CalculateWeights(RandomiseWildEncounters_CalculateInitialWeight, &typeHint);
+    if (room->areaIdx < HACK_PATH_AREA_COUNT)
+        enc = &gHackPathEncounters[room->areaIdx];
 
-        for(i = 0; i < WILD_ENCOUNTER_GRASS_CAPACITY; ++i)
-        {
-            if(i == 0)
-            {
-                if(RogueWeightQuery_HasAnyWeights())
-                {
-                    // We actually have a mon of this type
-                    gRogueRun.wildEncounters.species[i] = RogueWeightQuery_SelectRandomFromWeightsWithUpdate(RogueRandom(), 0);
-
-                    // Reroll query to allow anything now
-                    RogueMiscQuery_EditElement(QUERY_FUNC_EXCLUDE, gRogueRun.wildEncounters.species[i]);
-                    RogueWeightQuery_CalculateWeights(RandomiseWildEncounters_CalculateWeight, NULL);
-                    continue;
-                }
-                else
-                {
-                    // Reroll query to allow anything and fallback to below (Can hit here if no mon of hint type e.g. gen 1 on dark hint route)
-                    RogueMiscQuery_EditElement(QUERY_FUNC_EXCLUDE, gRogueRun.wildEncounters.species[i]);
-                    RogueWeightQuery_CalculateWeights(RandomiseWildEncounters_CalculateWeight, NULL);
-                }
-            }
-
-            if(RogueWeightQuery_HasAnyWeights())
-                gRogueRun.wildEncounters.species[i] = RogueWeightQuery_SelectRandomFromWeightsWithUpdate(RogueRandom(), 0);
-            else
-                gRogueRun.wildEncounters.species[i] = SPECIES_NONE;
-
-            gRogueRun.wildEncounters.catchCounts[i] = 0;
-        }
-
-        RogueWeightQuery_End();
-    }
-    EndWildEncounterQuery();
+    RogueFixed_FillEncounterSlots(enc,
+        &gRogueRun.wildEncounters.species[0], WILD_ENCOUNTER_GRASS_CAPACITY,
+        &gRogueRun.wildEncounters.species[WILD_ENCOUNTER_GRASS_CAPACITY], WILD_ENCOUNTER_WATER_CAPACITY);
+    memset(&gRogueRun.wildEncounters.catchCounts, 0, sizeof(gRogueRun.wildEncounters.catchCounts));
 }
 
 bool8 Rogue_CanScatterPokeblock(u16 itemId)

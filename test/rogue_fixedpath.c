@@ -47,6 +47,11 @@ TEST("RogueFixed_BuildPath makes a straight line in play order")
     EXPECT_EQ(path.rooms[0].roomParams.perType.boss.trainerNum, 42);
     EXPECT_EQ(path.rooms[1].roomParams.perType.route.difficulty, 1);
     EXPECT_EQ(path.rooms[2].roomParams.perType.route.difficulty, 5);
+
+    // Indice da area (lista de encontros), na ordem do dado (nao invertido).
+    EXPECT_EQ(path.rooms[2].areaIdx, 0); // rooms[2] guarda steps[0] (1a area)
+    EXPECT_EQ(path.rooms[1].areaIdx, 1);
+    EXPECT_EQ(path.rooms[0].areaIdx, 2); // rooms[0] guarda steps[2] (chefe)
 }
 
 TEST("RogueFixed_FillEncounterSlots fills grass then water")

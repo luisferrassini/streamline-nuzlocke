@@ -31,6 +31,9 @@ void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct R
         out->rooms[i].rngSeed = 0;
         out->rooms[i].roomParams.roomIdx = i;
 
+        // Indice da area na ordem do dado (o passo que caiu nesta sala).
+        out->rooms[i].areaIdx = count - 1 - i;
+
         // perType é uma união: escrever só o campo do tipo da sala.
         if (step->roomType == ADVPATH_ROOM_BOSS)
             out->rooms[i].roomParams.perType.boss.trainerNum = step->extra;

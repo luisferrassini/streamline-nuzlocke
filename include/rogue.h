@@ -120,6 +120,7 @@ struct RogueAdvPathRoom
     u16 rngSeed;
     u8 roomType;
     u8 connectionMask;
+    u8 areaIdx; // indice da area (lista de encontros) no caminho fixo
 };
 
 struct RogueAdvPath
