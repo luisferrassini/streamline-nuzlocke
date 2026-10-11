@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "rooms": [
+    { "type": "route", "difficulty": 0 },
+    { "type": "route", "difficulty": 0 },
+    { "type": "boss",  "trainer": 0 }
+  ]
+}

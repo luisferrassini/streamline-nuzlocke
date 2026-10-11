@@ -53,3 +53,8 @@ $(DATA_SRC_SUBDIR)/rogue/pokemon_expansion_profiles.h: $(DATA_SRC_SUBDIR)/rogue/
 
 $(DATA_SRC_SUBDIR)/rogue/pokemon_expansion_profiles_revised.h: $(DATA_SRC_SUBDIR)/rogue/pokemon/expansion/*/expansion_profile.json $(DATA_SRC_SUBDIR)/rogue/pokemon/expansion/*/expansion_profile_revised.json
 	$(CUSTOMJSON) pokemonprofile_c $(DATA_SRC_SUBDIR)/rogue/pokemon/*expansion_profile_revised.json $@
+
+
+# Caminho fixo do Nuzlocke Enxuto (gerado por script Python)
+$(DATA_SRC_SUBDIR)/rogue/hack_path.h: $(DATA_SRC_SUBDIR)/rogue/hack_path.json
+	python3 tools/hack/gen_path_header.py $^ $@
