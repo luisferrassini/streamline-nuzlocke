@@ -1,8 +1,10 @@
 {
   "version": 1,
   "rooms": [
-    { "type": "route", "difficulty": 0 },
-    { "type": "route", "difficulty": 0 },
-    { "type": "boss",  "trainer": 0 }
+    { "type": "route", "difficulty": 0, "name": "Route 103",
+      "encounters": ["sunkern", "wingull", "ledyba"] },
+    { "type": "route", "difficulty": 0, "name": "Route 102",
+      "encounters": ["meowth", "sandshrew"] },
+    { "type": "boss", "trainer": 0, "encounters": [] }
   ]
 }

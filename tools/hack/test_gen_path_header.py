@@ -4,6 +4,7 @@
 Roda com: python3 tools/hack/test_gen_path_header.py
 """
 import os
+import re
 import sys
 import tempfile
 
@@ -15,9 +16,11 @@ import gen_path_header
 
 JSON_SAMPLE = """\
 {"version": 1, "rooms": [
-    { "type": "route", "difficulty": 0 },
-    { "type": "route", "difficulty": 0 },
-    { "type": "boss",  "trainer": 0 }
+    { "type": "route", "difficulty": 0, "name": "Route 103",
+      "encounters": ["sunkern", "wingull", "ledyba"] },
+    { "type": "route", "difficulty": 0, "name": "Route 102",
+      "encounters": ["meowth", "sandshrew"] },
+    { "type": "boss",  "trainer": 0, "encounters": [] }
 ]}
 """
 
@@ -61,6 +64,20 @@ def main():
         check("contador definido", "HACK_PATH_STEP_COUNT" in text)
         check("include do FixedPathStep", '#include "rogue_fixedpath.h"' in text)
 
+        # Listas de encontros por sala (Task 1): ordem do JSON, uma por sala.
+        check("array de encontros existe", "gHackPathEncounters[]" in text)
+        check("contador de areas definido", "HACK_PATH_AREA_COUNT" in text)
+        check("area0 tem sunkern", "SPECIES_SUNKERN" in text)
+        check("area1 tem meowth", "SPECIES_MEOWTH" in text)
+        check("chefe sem encontros", "{ NULL, 0 }," in text)
+        # Uma linha de entrada do array por sala (3 salas).
+        enc_entries = [line for line in lines
+                       if re.match(r"^\{ (NULL|sHackPathEncounters[0-9]+), [0-9]+ \},$", line)]
+        check("3 entradas no array de encontros", len(enc_entries) == 3)
+        check("area0 com 3 encontros", "{ sHackPathEncounters0, 3 }," in lines)
+        # A ordem nao pode ser invertida: o chefe (ultima sala) tem 0 encontros.
+        check("ultima entrada do array e vazia", enc_entries[-1] == "{ NULL, 0 },")
+
     # Os caminhos padrao (raiz do repo) nao podem cair dentro de tools/.
     repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     check("default json sob a raiz",
@@ -84,6 +101,16 @@ def main():
         check("recusa caminho acima de MAX_ROOMS", False)
     except ValueError:
         check("recusa caminho acima de MAX_ROOMS", True)
+
+    # Especie desconhecida deve falhar alto, nao gerar constante invalida.
+    bad_species = {"version": 1,
+                   "rooms": [{"type": "route", "difficulty": 0,
+                              "encounters": ["nao-existe-xyz"]}]}
+    try:
+        gen_path_header.parse(bad_species)
+        check("recusa especie desconhecida", False)
+    except ValueError:
+        check("recusa especie desconhecida", True)
 
     if failures:
         print("FALHAS: %d" % failures)
