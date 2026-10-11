@@ -25,6 +25,9 @@
 #include "rogue_trainers.h"
 #include "rogue_query.h"
 #include "rogue_quest.h"
+#include "rogue_fixedpath.h"
+
+#include "data/rogue/hack_path.h"
 
 
 #define ROOM_TO_WORLD_X 3
@@ -1327,7 +1330,7 @@ bool8 RogueAdv_GenerateAdventurePathsIfRequired()
 
         DebugPrintf("ADVPATH: Generating path for seed %d.", gRngRogueValue);
         Rogue_ResetAdventurePathBuffers();
-        GeneratePath(&pathSettings);
+        RogueFixed_BuildPath(gHackPathSteps, HACK_PATH_STEP_COUNT, &gRogueAdvPath);
         DebugPrint("ADVPATH: Finished generating path.");
 
         gRogueAdvPath.justGenerated = isNewGeneration;
