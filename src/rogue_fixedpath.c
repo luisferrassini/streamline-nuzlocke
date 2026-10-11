@@ -38,3 +38,22 @@ void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct R
             out->rooms[i].roomParams.perType.route.difficulty = step->param;
     }
 }
+
+void RogueFixed_FillEncounterSlots(const struct FixedPathRoomEncounters *enc,
+                                   u16 *grass, u8 grassCap,
+                                   u16 *water, u8 waterCap)
+{
+    u16 count = (enc != NULL) ? enc->count : 0;
+    u16 i;
+
+    // Grama: as primeiras grassCap especies da lista.
+    for (i = 0; i < grassCap; ++i)
+        grass[i] = (i < count) ? enc->species[i] : SPECIES_NONE;
+
+    // Agua: as seguintes, comecando depois da grama.
+    for (i = 0; i < waterCap; ++i)
+    {
+        u16 idx = grassCap + i;
+        water[i] = (idx < count) ? enc->species[idx] : SPECIES_NONE;
+    }
+}

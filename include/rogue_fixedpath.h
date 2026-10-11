@@ -21,4 +21,11 @@ struct FixedPathRoomEncounters
 
 void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct RogueAdvPath *out);
 
+// Preenche os slots de encontro a partir da lista da area.
+// Grama recebe as primeiras grassCap especies; agua, as seguintes.
+// Slots nao usados ficam SPECIES_NONE. enc NULL ou vazio deixa tudo NONE.
+void RogueFixed_FillEncounterSlots(const struct FixedPathRoomEncounters *enc,
+                                   u16 *grass, u8 grassCap,
+                                   u16 *water, u8 waterCap);
+
 #endif // GUARD_ROGUE_FIXEDPATH_H

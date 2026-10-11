@@ -48,3 +48,28 @@ TEST("RogueFixed_BuildPath makes a straight line in play order")
     EXPECT_EQ(path.rooms[1].roomParams.perType.route.difficulty, 1);
     EXPECT_EQ(path.rooms[2].roomParams.perType.route.difficulty, 5);
 }
+
+TEST("RogueFixed_FillEncounterSlots fills grass then water")
+{
+    static const u16 sList[] = { SPECIES_TREECKO, SPECIES_TORCHIC, SPECIES_MUDKIP, SPECIES_PIKACHU };
+    struct FixedPathRoomEncounters enc = { sList, 4 };
+    struct FixedPathRoomEncounters curto = { sList, 1 };
+    u16 grass[2];
+    u16 water[2];
+
+    RogueFixed_FillEncounterSlots(&enc, grass, 2, water, 2);
+    EXPECT_EQ(grass[0], SPECIES_TREECKO);
+    EXPECT_EQ(grass[1], SPECIES_TORCHIC);
+    EXPECT_EQ(water[0], SPECIES_MUDKIP);
+    EXPECT_EQ(water[1], SPECIES_PIKACHU);
+
+    RogueFixed_FillEncounterSlots(&curto, grass, 2, water, 2);
+    EXPECT_EQ(grass[0], SPECIES_TREECKO);
+    EXPECT_EQ(grass[1], SPECIES_NONE);
+    EXPECT_EQ(water[0], SPECIES_NONE);
+    EXPECT_EQ(water[1], SPECIES_NONE);
+
+    RogueFixed_FillEncounterSlots(NULL, grass, 2, water, 2);
+    EXPECT_EQ(grass[0], SPECIES_NONE);
+    EXPECT_EQ(water[0], SPECIES_NONE);
+}
