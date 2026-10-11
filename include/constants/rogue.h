@@ -813,6 +813,11 @@
 #define WILD_ENCOUNTER_WATER_CAPACITY 3
 #define WILD_ENCOUNTER_TOTAL_CAPACITY (WILD_ENCOUNTER_GRASS_CAPACITY + WILD_ENCOUNTER_WATER_CAPACITY)
 
+// Oferta de Pokemon por area (Nuzlocke Enxuto).
+// Cada area oferece 1 Pokemon sorteado: pegar agora ou adiar.
+#define GIFT_PENDING_CAPACITY 16 // areas adiadas guardadas de uma vez
+#define GIFT_RESOLVED_BYTES 8    // cobre 64 areas (1 bit por area)
+
 // safariMons slots:
 // 0-44 are for regular mons
 // 45-49 are for legends

@@ -290,6 +290,9 @@ struct RogueRunData
     u8 lastShopVisitDifficulty[ROGUE_SHOP_COUNT];
     u8 activeEvoItemFlags[8];
     u8 activeFormItemFlags[20]; // technically this isn't needed for Vanilla
+    u8 giftResolved[GIFT_RESOLVED_BYTES]; // 1 bit por area resolvida (pega ou adiada)
+    u8 giftPending[GIFT_PENDING_CAPACITY]; // areas adiadas, para resgatar depois
+    u8 giftPendingCount;
     union
     {
         struct RogueCampaignData_Generic generic;
