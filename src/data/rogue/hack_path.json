@@ -1,10 +1,525 @@
 {
   "version": 1,
   "rooms": [
-    { "type": "route", "difficulty": 0, "name": "Route 103",
-      "encounters": ["sunkern", "wingull", "ledyba"] },
-    { "type": "route", "difficulty": 0, "name": "Route 102",
-      "encounters": ["meowth", "sandshrew"] },
-    { "type": "boss", "trainer": 0, "encounters": [] }
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Starter",
+      "encounters": [
+        "treecko",
+        "mudkip",
+        "torchic"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Littleroot Town",
+      "encounters": [
+        "squirtle",
+        "totodile",
+        "croconaw",
+        "wartortle",
+        "luvdisc",
+        "goldeen",
+        "corphish",
+        "poliwhirl",
+        "seaking",
+        "crawdaunt"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 103",
+      "encounters": [
+        "sunkern",
+        "wingull",
+        "ledyba",
+        "spearow",
+        "skitty",
+        "ekans",
+        "mareep",
+        "hoppip",
+        "poliwag",
+        "spoink",
+        "aipom",
+        "taillow",
+        "kingler",
+        "seaking",
+        "qwilfish",
+        "mantine",
+        "remoraid",
+        "tentacool",
+        "octillery",
+        "qwilfish"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Oldale Town",
+      "encounters": [
+        "vulpix",
+        "slugma",
+        "numel",
+        "growlithe",
+        "ponyta",
+        "magby",
+        "cyndaquil",
+        "charmander"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 102",
+      "encounters": [
+        "meowth",
+        "sandshrew",
+        "nidoran-m",
+        "electrike",
+        "hoothoot",
+        "gulpin",
+        "spinarak",
+        "spoink",
+        "farfetchd",
+        "ralts",
+        "minun",
+        "pikachu",
+        "luvdisc",
+        "seaking",
+        "carvanha",
+        "poliwrath",
+        "politoed",
+        "barboach",
+        "psyduck",
+        "goldeen",
+        "corphish",
+        "golduck",
+        "whiscash"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Petalburg City",
+      "encounters": [
+        "krabby",
+        "corphish",
+        "poliwag",
+        "psyduck",
+        "surskit",
+        "marill",
+        "totodile",
+        "squirtle",
+        "slowpoke",
+        "crawdaunt",
+        "golduck",
+        "whiscash",
+        "azumarill",
+        "poliwhirl",
+        "azurill",
+        "luvdisc",
+        "goldeen"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 104 (South)",
+      "encounters": [
+        "jigglypuff",
+        "cubone",
+        "seedot",
+        "snubbull",
+        "nidoran-f",
+        "natu",
+        "mareep",
+        "spoink",
+        "hoothoot",
+        "venonat",
+        "drowzee",
+        "elekid",
+        "seaking",
+        "pelipper",
+        "swellow",
+        "pidgeot",
+        "wartortle",
+        "magikarp",
+        "golduck",
+        "whiscash"
+      ]
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Route 104 (North)",
+      "encounters": []
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Petalburg Woods",
+      "encounters": [
+        "oddish",
+        "hoothoot",
+        "phanpy",
+        "teddiursa",
+        "bellsprout",
+        "pineco",
+        "illumise",
+        "volbeat",
+        "cascoon",
+        "silcoon",
+        "mankey",
+        "slakoth"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Rustboro City",
+      "encounters": [
+        "shroomish",
+        "seedot",
+        "cacnea",
+        "bellsprout",
+        "oddish",
+        "hoppip",
+        "sunkern",
+        "roselia",
+        "chikorita",
+        "bulbasaur",
+        "exeggcute",
+        "lotad"
+      ]
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Rustboro City",
+      "encounters": []
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Rustboro City",
+      "encounters": []
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Rustboro Gym",
+      "encounters": []
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 115",
+      "encounters": [
+        "swablu",
+        "clefairy",
+        "eevee",
+        "absol",
+        "wigglytuff",
+        "swellow",
+        "beldum",
+        "kangaskhan",
+        "bagon",
+        "shelgon",
+        "metang",
+        "tentacool",
+        "qwilfish",
+        "relicanth",
+        "kabuto",
+        "omanyte",
+        "kabutops",
+        "omastar"
+      ]
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Mt. Chimney",
+      "encounters": []
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Mt. Chimney",
+      "encounters": []
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 116",
+      "encounters": [
+        "grimer",
+        "makuhita",
+        "yanma",
+        "natu",
+        "paras",
+        "voltorb",
+        "spoink",
+        "chimecho",
+        "ralts",
+        "unown",
+        "kakuna",
+        "metapod"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Rusturf Tunnel",
+      "encounters": [
+        "nosepass",
+        "geodude",
+        "onix",
+        "rhyhorn",
+        "phanpy",
+        "sandshrew",
+        "dunsparce",
+        "cubone",
+        "swinub",
+        "whismur",
+        "zubat"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 106",
+      "encounters": [
+        "seel",
+        "spheal",
+        "shellder",
+        "dewgong",
+        "sealeo",
+        "cloyster"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 107",
+      "encounters": [
+        "corsola",
+        "huntail",
+        "lanturn",
+        "clamperl",
+        "gorebyss",
+        "shellder",
+        "seel",
+        "spheal",
+        "cloyster",
+        "sealeo"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Dewford Town",
+      "encounters": [
+        "makuhita",
+        "mankey",
+        "machop",
+        "tyrogue",
+        "meditite",
+        "corsola",
+        "seel",
+        "spheal",
+        "krabby",
+        "slowpoke",
+        "shellder",
+        "clamperl",
+        "sealeo",
+        "huntail",
+        "dewgong",
+        "cloyster",
+        "gorebyss",
+        "walrein"
+      ]
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Dewford Gym",
+      "encounters": []
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Granite Cave",
+      "encounters": [
+        "aron",
+        "mawile",
+        "spoink",
+        "clefairy",
+        "spinda",
+        "teddiursa",
+        "ralts",
+        "drowzee",
+        "chimecho",
+        "seel",
+        "smoochum",
+        "delibird",
+        "sneasel",
+        "swinub",
+        "snorunt",
+        "spheal",
+        "shellder",
+        "onix",
+        "voltorb",
+        "magnemite",
+        "nosepass",
+        "makuhita",
+        "dunsparce",
+        "abra"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 109",
+      "encounters": [
+        "pelipper",
+        "kingler",
+        "seaking",
+        "wartortle",
+        "blastoise",
+        "squirtle",
+        "krabby",
+        "tentacool",
+        "goldeen",
+        "sharpedo",
+        "mantine"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Mauville City",
+      "encounters": [
+        "elekid",
+        "pikachu",
+        "voltorb",
+        "magnemite",
+        "mareep",
+        "porygon",
+        "electrike",
+        "pichu",
+        "flaaffy"
+      ]
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Mauville City",
+      "encounters": []
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Mauville Gym",
+      "encounters": []
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 110",
+      "encounters": [
+        "delcatty",
+        "roselia",
+        "pidgeotto",
+        "murkrow",
+        "nuzleaf",
+        "skiploom",
+        "tropius",
+        "togetic",
+        "lickitung",
+        "kecleon",
+        "oddish",
+        "poochyena",
+        "chinchou",
+        "seaking",
+        "croconaw",
+        "feraligatr",
+        "lanturn",
+        "qwilfish",
+        "remoraid",
+        "tentacool",
+        "mantine",
+        "sharpedo",
+        "whiscash"
+      ]
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Route 110",
+      "encounters": []
+    },
+    {
+      "type": "boss",
+      "trainer": 0,
+      "name": "Route 110",
+      "encounters": []
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Route 118",
+      "encounters": [
+        "growlithe",
+        "manectric",
+        "vulpix",
+        "rapidash",
+        "grumpig",
+        "nuzleaf",
+        "weepinbell",
+        "gloom",
+        "nidorina",
+        "nidorino",
+        "pikachu",
+        "exeggcute",
+        "tentacool",
+        "chinchou",
+        "mantine",
+        "qwilfish",
+        "octillery",
+        "carvanha",
+        "remoraid",
+        "sharpedo"
+      ]
+    },
+    {
+      "type": "route",
+      "difficulty": 0,
+      "name": "Slateport City",
+      "encounters": [
+        "mareep",
+        "elekid",
+        "voltorb",
+        "electrike",
+        "pikachu",
+        "minun",
+        "plusle",
+        "pichu",
+        "magnemite",
+        "flaaffy",
+        "octillery",
+        "mantine",
+        "pelipper",
+        "sharpedo",
+        "seadra",
+        "chinchou",
+        "corsola",
+        "remoraid",
+        "horsea",
+        "lanturn"
+      ]
+    }
   ]
 }
