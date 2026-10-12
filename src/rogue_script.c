@@ -368,6 +368,63 @@ void Rogue_AreaGiftDelay(void)
     RogueAreaGift_AddPending(RogueAreaGift_CurrentAreaIdx());
 }
 
+static const u8 sText_PendingGiftUnknown[] = _("Unknown area");
+
+// Quantidade de ofertas adiadas (lida com specialvar).
+u16 Rogue_PendingGiftCount(void)
+{
+    return RogueAreaGift_PendingCount();
+}
+
+// Area do slot gSpecialVar_0x8001 (lida com specialvar).
+u16 Rogue_PendingGiftAreaAt(void)
+{
+    return RogueAreaGift_PendingArea(gSpecialVar_0x8001);
+}
+
+// Monta as opcoes do multichoice com as areas adiadas.
+void Rogue_PendingGiftAppendOptions(void)
+{
+    u8 i;
+    u8 count = RogueAreaGift_PendingCount();
+
+    for(i = 0; i < count; ++i)
+    {
+        u8 areaIdx = RogueAreaGift_PendingArea(i);
+        const u8 *name = RogueAreaGift_AreaName(areaIdx);
+
+        ScriptMenu_ScrollingMultichoiceDynamicAppendOption(name != NULL ? name : sText_PendingGiftUnknown, i);
+    }
+}
+
+// Resgata a area do slot gSpecialVar_0x8001 e entrega o Pokemon.
+void Rogue_PendingGiftClaim(void)
+{
+    u8 slot = gSpecialVar_0x8001;
+    u8 areaIdx;
+    u16 species;
+    struct Pokemon mon;
+
+    if(slot >= RogueAreaGift_PendingCount())
+    {
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return;
+    }
+
+    areaIdx = RogueAreaGift_PendingArea(slot);
+    species = RogueAreaGift_RollSpecies(areaIdx);
+    RogueAreaGift_RemovePending(slot);
+
+    if(species == SPECIES_NONE)
+    {
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return;
+    }
+
+    CreateMon(&mon, species, Rogue_CalculatePlayerMonLvl(), USE_RANDOM_IVS, 0, 0, OT_ID_PLAYER_ID, 0);
+    gSpecialVar_Result = GiveMonToPlayer(&mon);
+}
+
 u16 Rogue_GetMonEvoCount(void)
 {
     u16 monIdx = gSpecialVar_0x8004;

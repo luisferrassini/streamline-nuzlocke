@@ -162,6 +162,10 @@ gSpecials::
 	def_special Rogue_CalcMaxPartySize
 	def_special Rogue_AreaGiftTake
 	def_special Rogue_AreaGiftDelay
+	def_special Rogue_PendingGiftCount
+	def_special Rogue_PendingGiftAreaAt
+	def_special Rogue_PendingGiftAppendOptions
+	def_special Rogue_PendingGiftClaim
 	def_special Rogue_GetMonEvoCount
 	def_special Rogue_GetMonEvoParams
 	def_special RogueDebug_FillGenPC

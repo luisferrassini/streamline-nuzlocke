@@ -78,6 +78,13 @@ def main():
         # A ordem nao pode ser invertida: o chefe (ultima sala) tem 0 encontros.
         check("ultima entrada do array e vazia", enc_entries[-1] == "{ NULL, 0 },")
 
+        # Nomes de area (Task 6): uma string por sala, na ordem do JSON.
+        check("array de nomes existe", "gHackPathAreaNames[]" in text)
+        check("contador de nomes definido", "HACK_PATH_NAME_COUNT" in text)
+        check("nome da area0", '_("Route 103")' in text)
+        check("nome da area1", '_("Route 102")' in text)
+        check("nome vazio do chefe", '_("")' in text)
+
     # Os caminhos padrao (raiz do repo) nao podem cair dentro de tools/.
     repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     check("default json sob a raiz",

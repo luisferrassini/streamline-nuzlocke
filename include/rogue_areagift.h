@@ -14,6 +14,8 @@ bool8 RogueAreaGift_IsResolved(u8 areaIdx);
 void RogueAreaGift_MarkResolved(u8 areaIdx);
 // Indice da area da sala atual do caminho.
 u8 RogueAreaGift_CurrentAreaIdx(void);
+// Nome de exibicao da area. NULL se o indice for invalido.
+const u8 *RogueAreaGift_AreaName(u8 areaIdx);
 // Poe a area na fila de adiadas. FALSE se a fila estiver cheia ou a area repetida.
 bool8 RogueAreaGift_AddPending(u8 areaIdx);
 u8 RogueAreaGift_PendingCount(void);

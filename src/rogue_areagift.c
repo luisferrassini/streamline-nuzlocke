@@ -11,6 +11,13 @@ u8 RogueAreaGift_CurrentAreaIdx(void)
     return gRogueAdvPath.rooms[gRogueRun.adventureRoomId].areaIdx;
 }
 
+const u8 *RogueAreaGift_AreaName(u8 areaIdx)
+{
+    if(areaIdx >= HACK_PATH_AREA_COUNT)
+        return NULL;
+    return gHackPathAreaNames[areaIdx];
+}
+
 u16 RogueAreaGift_RollSpecies(u8 areaIdx)
 {
     const struct FixedPathRoomEncounters *enc;

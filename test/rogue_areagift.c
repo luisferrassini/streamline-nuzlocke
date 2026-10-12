@@ -4,6 +4,7 @@
 #include "rogue_areagift.h"
 #include "rogue_adventurepaths.h"
 #include "rogue_controller.h"
+#include "string_util.h"
 #include "../src/data/rogue/hack_path.h"
 
 TEST("RogueAreaGift pending add/remove e resolved")
@@ -41,6 +42,12 @@ TEST("RogueAreaGift CurrentAreaIdx le a sala atual")
 
     gRogueRun.adventureRoomId = savedId;
     gRogueAdvPath.rooms[1].areaIdx = savedArea;
+}
+
+TEST("RogueAreaGift AreaName le o nome da area")
+{
+    EXPECT_EQ(StringCompare(RogueAreaGift_AreaName(0), sHackPathName0), 0);
+    EXPECT(RogueAreaGift_AreaName(HACK_PATH_AREA_COUNT) == NULL);
 }
 
 TEST("RogueAreaGift roll fica dentro da lista")

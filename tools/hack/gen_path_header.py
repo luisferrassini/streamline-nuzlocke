@@ -34,6 +34,11 @@ def species_const(name):
     return "SPECIES_" + key
 
 
+def c_escape(text):
+    """Escapa texto para virar literal C entre aspas duplas."""
+    return text.replace("\\", "\\\\").replace('"', '\\"')
+
+
 def load_species_constants(path=None):
     """Conjunto das constantes SPECIES_* declaradas em species.h."""
     if path is None:
@@ -50,16 +55,18 @@ def load_species_constants(path=None):
 
 
 def parse(data):
-    """Converte o JSON em (entradas, listas_de_encontros) por sala.
+    """Converte o JSON em (entradas, listas_de_encontros, nomes) por sala.
 
     entradas: [(roomType, param, extra)]
     listas_de_encontros: [[SPECIES_*, ...]] na ordem do JSON (nao invertida).
+    nomes: [str] na ordem do JSON (nome da area; "" se faltar).
     """
     if data.get("version") != 1:
         raise ValueError("versao do json desconhecida: %r" % data.get("version"))
     species = load_species_constants()
     entries = []
     encounter_lists = []
+    names = []
     for room in data.get("rooms", []):
         rtype = room.get("type")
         if rtype not in ROOM_TYPES:
@@ -69,9 +76,11 @@ def parse(data):
         else:
             entries.append((ROOM_TYPES[rtype], int(room.get("difficulty", 0)), 0))
 
-        names = room.get("encounters") or []
+        names.append(room.get("name", ""))
+
+        names_list = room.get("encounters") or []
         consts = []
-        for name in names:
+        for name in names_list:
             const = species_const(name)
             if const not in species:
                 raise ValueError("especie desconhecida: %r (%s)" % (name, const))
@@ -81,10 +90,10 @@ def parse(data):
     if len(entries) > MAX_ROOMS:
         raise ValueError("caminho com %d salas; o limite e %d (ROGUE_ADVPATH_ROOM_CAPACITY)"
                          % (len(entries), MAX_ROOMS))
-    return entries, encounter_lists
+    return entries, encounter_lists, names
 
 
-def render(entries, encounter_lists):
+def render(entries, encounter_lists, names):
     """Monta o texto do header C a partir das entradas e listas de encontros."""
     lines = [
         "// AUTO-GERADO por tools/hack/gen_path_header.py. NAO edite a mao.",
@@ -120,8 +129,22 @@ def render(entries, encounter_lists):
     lines += [
         "};",
         "",
+    ]
+
+    # Nomes de area, na ordem do JSON (para o menu de ofertas pendentes).
+    for i, name in enumerate(names):
+        lines.append('static const u8 sHackPathName%d[] = _("%s");' % (i, c_escape(name)))
+    lines += [
+        "static const u8 *const gHackPathAreaNames[] =",
+        "{",
+    ]
+    lines += ["    sHackPathName%d," % i for i in range(len(names))]
+    lines += [
+        "};",
+        "",
         "#define HACK_PATH_STEP_COUNT ARRAY_COUNT(gHackPathSteps)",
         "#define HACK_PATH_AREA_COUNT ARRAY_COUNT(gHackPathEncounters)",
+        "#define HACK_PATH_NAME_COUNT ARRAY_COUNT(gHackPathAreaNames)",
         "",
         "#endif // GUARD_DATA_ROGUE_HACK_PATH_H",
     ]
@@ -132,8 +155,8 @@ def generate(json_path, header_path):
     """Le o JSON e escreve o header."""
     with open(json_path, "r") as f:
         data = json.load(f)
-    entries, encounter_lists = parse(data)
-    header = render(entries, encounter_lists)
+    entries, encounter_lists, names = parse(data)
+    header = render(entries, encounter_lists, names)
     header_dir = os.path.dirname(header_path)
     if header_dir:
         os.makedirs(header_dir, exist_ok=True)

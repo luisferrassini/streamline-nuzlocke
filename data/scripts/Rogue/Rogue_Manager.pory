@@ -735,6 +735,59 @@ script Rogue_EventScript_AreaGiftPrompt
     end
 }
 
+script Rogue_EventScript_ClaimPendingGift
+{
+    lockall
+
+    specialvar(VAR_TEMP_0, Rogue_PendingGiftCount)
+
+    if(var(VAR_TEMP_0) == 0)
+    {
+        msgbox("You have no pending Pokemon.")
+    }
+    else
+    {
+        begindynamicmultichoice
+        special(Rogue_PendingGiftAppendOptions)
+        message("Take which pending Pokemon?")
+        waitmessage
+        enddynamicmultichoice(1, 0, 6, TRUE)
+
+        copyvar(VAR_0x8001, VAR_RESULT)
+
+        if(var(VAR_0x8001) != MULTI_B_PRESSED)
+        {
+            specialvar(VAR_TEMP_0, CalculatePlayerPartyCount)
+            specialvar(VAR_TEMP_1, Rogue_CalcMaxPartySize)
+
+            if(var(VAR_TEMP_0) >= VAR_TEMP_1)
+            {
+                msgbox("Your party is full. Release a Pokemon to make room.")
+                special(ChoosePartyMon)
+                waitstate
+
+                if(var(VAR_0x8004) == PARTY_NOTHING_CHOSEN)
+                {
+                    releaseall
+                    end
+                }
+
+                special(Rogue_ReleaseMonInSlot)
+            }
+
+            special(Rogue_PendingGiftClaim)
+            playfanfare(MUS_OBTAIN_ITEM)
+            message("You obtained the pending Pokemon!")
+            waitfanfare
+            waitmessage
+            closemessage
+        }
+    }
+
+    releaseall
+    end
+}
+
 script Rogue_EventScript_AttemptPostGymHeal
 {
     // Don't heal if we're in the healing flask mode

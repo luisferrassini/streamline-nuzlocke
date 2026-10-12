@@ -79,6 +79,7 @@ enum
     MENU_ACTION_QUICK_SAVE,
     MENU_ACTION_QUESTS,
     MENU_ACTION_DECORATE,
+    MENU_ACTION_PENDING_GIFT,
     MENU_ACTION_DEBUG,
 };
 
@@ -100,7 +101,7 @@ EWRAM_DATA static u8 sBattlePyramidFloorWindowId = 0;
 EWRAM_DATA static u8 sRogueRunWindowId = 0;
 EWRAM_DATA static u8 sStartMenuCursorPos = 0;
 EWRAM_DATA static u8 sNumStartMenuActions = 0;
-EWRAM_DATA static u8 sCurrentStartMenuActions[9] = {0};
+EWRAM_DATA static u8 sCurrentStartMenuActions[10] = {0};
 EWRAM_DATA static s8 sInitStartMenuData[2] = {0};
 
 EWRAM_DATA static u8 (*sSaveDialogCallback)(void) = NULL;
@@ -114,6 +115,7 @@ static bool8 StartMenuPokedexCallback(void);
 static bool8 StartMenuPokemonCallback(void);
 static bool8 StartMenuQuestsCallback(void);
 static bool8 StartMenuDecorateCallback(void);
+static bool8 StartMenuPendingGiftCallback(void);
 static bool8 StartMenuBagCallback(void);
 static bool8 StartMenuPokeNavCallback(void);
 static bool8 StartMenuPlayerNameCallback(void);
@@ -235,6 +237,7 @@ static const struct MenuAction sStartMenuItems[] =
     [MENU_ACTION_QUICK_SAVE]      = {gText_MenuQuickSave,   {.u8_void = StartMenuQuickSaveCallback}},
     [MENU_ACTION_QUESTS]          = {gText_MenuQuests,      {.u8_void = StartMenuQuestsCallback}},
     [MENU_ACTION_DECORATE]        = {gText_MenuDecorate,    {.u8_void = StartMenuDecorateCallback}},
+    [MENU_ACTION_PENDING_GIFT]    = {gText_MenuPendingGift, {.u8_void = StartMenuPendingGiftCallback}},
 };
 
 static const struct BgTemplate sBgTemplates_LinkBattleSave[] =
@@ -447,6 +450,7 @@ static void BuildRogueRunStartMenu(void)
         }
     }
 
+    AddStartMenuAction(MENU_ACTION_PENDING_GIFT);
     AddStartMenuAction(MENU_ACTION_OPTION);
     AddStartMenuAction(MENU_ACTION_RETIRE_ADVENTURE);
     //AddStartMenuAction(MENU_ACTION_EXIT);
@@ -894,6 +898,7 @@ static bool8 StartMenuQuestsCallback(void)
 }
 
 extern const u8 Rogue_Area_Home_DecorateFromMenu[];
+extern const u8 Rogue_EventScript_ClaimPendingGift[];
 
 static bool8 StartMenuDecorateCallback(void)
 {
@@ -901,6 +906,16 @@ static bool8 StartMenuDecorateCallback(void)
     HideStartMenu();
 
     ScriptContext_SetupScript(Rogue_Area_Home_DecorateFromMenu);
+
+    return TRUE;
+}
+
+static bool8 StartMenuPendingGiftCallback(void)
+{
+    RemoveExtraStartMenuWindows();
+    HideStartMenu();
+
+    ScriptContext_SetupScript(Rogue_EventScript_ClaimPendingGift);
 
     return TRUE;
 }
