@@ -10,6 +10,10 @@
 u16 RogueAreaGift_RollSpecies(u8 areaIdx);
 // TRUE se a area ja foi resolvida (o jogador pegou ou adiou).
 bool8 RogueAreaGift_IsResolved(u8 areaIdx);
+// Marca a area como resolvida (usado quando o jogador pega).
+void RogueAreaGift_MarkResolved(u8 areaIdx);
+// Indice da area da sala atual do caminho.
+u8 RogueAreaGift_CurrentAreaIdx(void);
 // Poe a area na fila de adiadas. FALSE se a fila estiver cheia ou a area repetida.
 bool8 RogueAreaGift_AddPending(u8 areaIdx);
 u8 RogueAreaGift_PendingCount(void);

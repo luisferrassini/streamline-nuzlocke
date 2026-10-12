@@ -2,8 +2,14 @@
 #include "random.h"
 #include "rogue.h"
 #include "rogue_controller.h"
+#include "rogue_adventurepaths.h"
 #include "rogue_areagift.h"
 #include "data/rogue/hack_path.h"
+
+u8 RogueAreaGift_CurrentAreaIdx(void)
+{
+    return gRogueAdvPath.rooms[gRogueRun.adventureRoomId].areaIdx;
+}
 
 u16 RogueAreaGift_RollSpecies(u8 areaIdx)
 {
@@ -36,6 +42,11 @@ static void SetResolved(u8 areaIdx)
 
     if (byte < GIFT_RESOLVED_BYTES)
         gRogueRun.giftResolved[byte] |= (1 << bit);
+}
+
+void RogueAreaGift_MarkResolved(u8 areaIdx)
+{
+    SetResolved(areaIdx);
 }
 
 bool8 RogueAreaGift_AddPending(u8 areaIdx)

@@ -692,6 +692,49 @@ script Rogue_EventScript_AttemptSnagBattle
     release
 }
 
+script Rogue_EventScript_AreaGiftPrompt
+{
+    lockall
+
+    msgbox("This area has wild Pokemon. Take this area's Pokemon now, or leave it for later?", MSGBOX_YESNO)
+
+    if(var(VAR_RESULT) == YES)
+    {
+        specialvar(VAR_TEMP_0, CalculatePlayerPartyCount)
+        specialvar(VAR_TEMP_1, Rogue_CalcMaxPartySize)
+
+        if(var(VAR_TEMP_0) >= VAR_TEMP_1)
+        {
+            msgbox("Your party is full. Release a Pokemon to make room.")
+            special(ChoosePartyMon)
+            waitstate
+
+            if(var(VAR_0x8004) == PARTY_NOTHING_CHOSEN)
+            {
+                releaseall
+                end
+            }
+
+            special(Rogue_ReleaseMonInSlot)
+        }
+
+        special(Rogue_AreaGiftTake)
+        playfanfare(MUS_OBTAIN_ITEM)
+        message("You obtained the area's Pokemon!")
+        waitfanfare
+        waitmessage
+        closemessage
+    }
+    else
+    {
+        special(Rogue_AreaGiftDelay)
+        msgbox("Left for later. You can take it from the menu.")
+    }
+
+    releaseall
+    end
+}
+
 script Rogue_EventScript_AttemptPostGymHeal
 {
     // Don't heal if we're in the healing flask mode

@@ -58,6 +58,7 @@
 #include "rogue.h"
 #include "rogue_fixedpath.h"
 #include "data/rogue/hack_path.h"
+#include "rogue_areagift.h"
 #include "rogue_assistant.h"
 #include "rogue_automation.h"
 #include "rogue_adventurepaths.h"
@@ -171,6 +172,7 @@ struct RogueLocalData
     bool8 hasBattleInputStarted : 1;
     bool8 hasPendingSnagBattle : 1;
     bool8 hasPendingRidemonTrappedCheck : 1;
+    bool8 areaGiftPromptPending : 1;
 };
 
 typedef u16 hot_track_dat;
@@ -3375,6 +3377,7 @@ extern const u8 Rogue_ForceNicknameMon[];
 extern const u8 Rogue_AskNicknameMon[];
 extern const u8 Rogue_Encounter_RestStop_RandomMan[];
 extern const u8 Rogue_EventScript_AttemptSnagBattle[];
+extern const u8 Rogue_EventScript_AreaGiftPrompt[];
 extern const u8 Rogue_Ridemon_PlayerIsTrapped[];
 extern const u8 RogueMP_OnHostReloadInRun[];
 extern const u8 RogueMP_OnClientReloadInRun[];
@@ -3566,6 +3569,12 @@ bool8 Rogue_OnProcessPlayerFieldInput(void)
         gSpecialVar_0x800B = GetMonData(&gEnemyParty[gSpecialVar_0x800A], MON_DATA_SPECIES);
         StringCopy_Nickname(gStringVar1, RoguePokedex_GetSpeciesName(gSpecialVar_0x800B));
         ScriptContext_SetupScript(Rogue_EventScript_AttemptSnagBattle);
+        return TRUE;
+    }
+    else if(gRogueLocal.areaGiftPromptPending)
+    {
+        gRogueLocal.areaGiftPromptPending = FALSE;
+        ScriptContext_SetupScript(Rogue_EventScript_AreaGiftPrompt);
         return TRUE;
     }
     else if(gRogueLocal.hasPendingRidemonTrappedCheck && !Rogue_IsRideMonFlying()) // wait until we've landed to run the script
@@ -5821,6 +5830,10 @@ void Rogue_OnSetWarpData(struct WarpData *warp)
 
             VarSet(VAR_ROGUE_DESIRED_WEATHER, WEATHER_NONE);
 
+            // Zera a oferta da area. A sala de rota liga de novo se ainda nao
+            // foi resolvida (pega ou adiada).
+            gRogueLocal.areaGiftPromptPending = FALSE;
+
             // We're warping into a valid map
             // We've already set the next room type so adjust the scaling now
             switch(gRogueAdvPath.currentRoomType)
@@ -5845,6 +5858,17 @@ void Rogue_OnSetWarpData(struct WarpData *warp)
                     RandomiseEnabledTrainers();
                     RandomiseEnabledItems();
                     TryOptionalRandomanSpawn();
+
+                    // Liga o prompt da oferta de Pokemon se a area ainda nao
+                    // foi resolvida.
+                    {
+                        u8 areaIdx = RogueAreaGift_CurrentAreaIdx();
+
+                        if(areaIdx < HACK_PATH_AREA_COUNT
+                            && gHackPathEncounters[areaIdx].count > 0
+                            && !RogueAreaGift_IsResolved(areaIdx))
+                            gRogueLocal.areaGiftPromptPending = TRUE;
+                    }
 
                     if(Rogue_GetCurrentDifficulty() != 0 && RogueRandomChance(weatherChance, OVERWORLD_FLAG))
                     {

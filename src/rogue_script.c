@@ -29,6 +29,7 @@
 
 #include "rogue.h"
 #include "rogue_adventurepaths.h"
+#include "rogue_areagift.h"
 #include "rogue_assistant.h"
 #include "rogue_baked.h"
 #include "rogue_campaign.h"
@@ -341,6 +342,30 @@ void Rogue_ReleaseMonInSlot(void)
 u16 Rogue_CalcMaxPartySize(void)
 {
     return Rogue_GetMaxPartySize();
+}
+
+// Oferta da area: sorteia e entrega o Pokemon da area atual.
+void Rogue_AreaGiftTake(void)
+{
+    u8 areaIdx = RogueAreaGift_CurrentAreaIdx();
+    u16 species = RogueAreaGift_RollSpecies(areaIdx);
+    struct Pokemon mon;
+
+    if(species == SPECIES_NONE)
+    {
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return;
+    }
+
+    CreateMon(&mon, species, Rogue_CalculatePlayerMonLvl(), USE_RANDOM_IVS, 0, 0, OT_ID_PLAYER_ID, 0);
+    RogueAreaGift_MarkResolved(areaIdx);
+    gSpecialVar_Result = GiveMonToPlayer(&mon);
+}
+
+// Oferta da area: adia, para resgatar depois pelo menu.
+void Rogue_AreaGiftDelay(void)
+{
+    RogueAreaGift_AddPending(RogueAreaGift_CurrentAreaIdx());
 }
 
 u16 Rogue_GetMonEvoCount(void)
