@@ -34,6 +34,7 @@
 #include "rogue_baked.h"
 #include "rogue_campaign.h"
 #include "rogue_controller.h"
+
 #include "rogue_charms.h"
 #include "rogue_followmon.h"
 #include "rogue_gifts.h"
@@ -365,7 +366,12 @@ void Rogue_AreaGiftTake(void)
 // Oferta da area: adia, para resgatar depois pelo menu.
 void Rogue_AreaGiftDelay(void)
 {
-    RogueAreaGift_AddPending(RogueAreaGift_CurrentAreaIdx());
+    gSpecialVar_Result = RogueAreaGift_AddPending(RogueAreaGift_CurrentAreaIdx()) ? 1 : 0;
+}
+
+void Rogue_AreaGiftRetryPrompt(void)
+{
+    // movido para rogue_controller.c para evitar acerto de header
 }
 
 static const u8 sText_PendingGiftUnknown[] = _("Unknown area");

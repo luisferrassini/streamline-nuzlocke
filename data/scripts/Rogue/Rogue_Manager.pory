@@ -711,6 +711,16 @@ script Rogue_EventScript_AreaGiftPrompt
 
             if(var(VAR_0x8004) == PARTY_NOTHING_CHOSEN)
             {
+                special(Rogue_AreaGiftDelay)
+                if(var(VAR_RESULT) == 0)
+                {
+                    msgbox("Pending list is full. The gift could not be stored.")
+                    special(Rogue_AreaGiftRetryPrompt)
+                }
+                else
+                {
+                    msgbox("Left for later. You can take it from the menu.")
+                }
                 releaseall
                 end
             }
@@ -728,7 +738,15 @@ script Rogue_EventScript_AreaGiftPrompt
     else
     {
         special(Rogue_AreaGiftDelay)
-        msgbox("Left for later. You can take it from the menu.")
+        if(var(VAR_RESULT) == 0)
+        {
+            msgbox("Pending list is full. The gift could not be stored.")
+            special(Rogue_AreaGiftRetryPrompt)
+        }
+        else
+        {
+            msgbox("Left for later. You can take it from the menu.")
+        }
     }
 
     releaseall
