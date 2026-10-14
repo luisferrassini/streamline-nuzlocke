@@ -78,3 +78,23 @@ TEST("RogueFixed_FillEncounterSlots fills grass then water")
     EXPECT_EQ(grass[0], SPECIES_NONE);
     EXPECT_EQ(water[0], SPECIES_NONE);
 }
+
+TEST("RogueFixed_FillParty cria os mons do time")
+{
+    static const struct FixedPathPartyMon sMons[] = {
+        { SPECIES_GEODUDE, 15 }, { SPECIES_NOSEPASS, 14 }, { SPECIES_MAKUHITA, 12 },
+    };
+    struct FixedPathRoomParty team = { sMons, 3 };
+    struct Pokemon party[2];
+    u16 n = RogueFixed_FillParty(&team, party, 2);
+
+    EXPECT_EQ(n, 2); // trunca na capacidade
+    EXPECT_EQ(GetMonData(&party[0], MON_DATA_SPECIES), SPECIES_GEODUDE);
+    EXPECT_EQ(GetMonData(&party[0], MON_DATA_LEVEL), 15);
+    EXPECT_EQ(GetMonData(&party[1], MON_DATA_SPECIES), SPECIES_NOSEPASS);
+    EXPECT_EQ(GetMonData(&party[1], MON_DATA_LEVEL), 14);
+
+    EXPECT_EQ(RogueFixed_PartyMaxLevel(&team), 15);
+    EXPECT_EQ(RogueFixed_FillParty(NULL, party, 2), 0);
+    EXPECT_EQ(RogueFixed_PartyMaxLevel(NULL), 0);
+}

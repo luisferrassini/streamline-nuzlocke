@@ -55,11 +55,12 @@ def load_species_constants(path=None):
 
 
 def parse(data):
-    """Converte o JSON em (entradas, listas_de_encontros, nomes) por sala.
+    """Converte o JSON em (entradas, listas_de_encontros, nomes, listas_de_times).
 
     entradas: [(roomType, param, extra)]
     listas_de_encontros: [[SPECIES_*, ...]] na ordem do JSON (nao invertida).
     nomes: [str] na ordem do JSON (nome da area; "" se faltar).
+    listas_de_times: [[(SPECIES_*, level), ...]] na ordem do JSON ([] se faltar).
     """
     if data.get("version") != 1:
         raise ValueError("versao do json desconhecida: %r" % data.get("version"))
@@ -67,6 +68,7 @@ def parse(data):
     entries = []
     encounter_lists = []
     names = []
+    party_lists = []
     for room in data.get("rooms", []):
         rtype = room.get("type")
         if rtype not in ROOM_TYPES:
@@ -87,13 +89,28 @@ def parse(data):
             consts.append(const)
         encounter_lists.append(consts)
 
+        # Time de chefe: validar cada especie e cada nivel (falhar alto).
+        party = room.get("party") or []
+        mons = []
+        for mon in party:
+            const = species_const(mon.get("species", ""))
+            if const not in species:
+                raise ValueError("especie desconhecida no time: %r (%s)"
+                                 % (mon.get("species"), const))
+            try:
+                level = int(mon.get("level"))
+            except (TypeError, ValueError):
+                raise ValueError("nivel invalido no time: %r" % mon.get("level"))
+            mons.append((const, level))
+        party_lists.append(mons)
+
     if len(entries) > MAX_ROOMS:
         raise ValueError("caminho com %d salas; o limite e %d (ROGUE_ADVPATH_ROOM_CAPACITY)"
                          % (len(entries), MAX_ROOMS))
-    return entries, encounter_lists, names
+    return entries, encounter_lists, names, party_lists
 
 
-def render(entries, encounter_lists, names):
+def render(entries, encounter_lists, names, party_lists):
     """Monta o texto do header C a partir das entradas e listas de encontros."""
     lines = [
         "// AUTO-GERADO por tools/hack/gen_path_header.py. NAO edite a mao.",
@@ -131,6 +148,38 @@ def render(entries, encounter_lists, names):
         "",
     ]
 
+    # Times de chefe por sala e a tabela que os reune, na ordem do JSON.
+    party_table = []
+    for i, mons in enumerate(party_lists):
+        if mons:
+            body = ", ".join("{ %s, %d }" % (const, level) for const, level in mons)
+            lines.append("static const struct FixedPathPartyMon sHackPathParty%d[] = { %s };"
+                         % (i, body))
+            party_table.append("{ sHackPathParty%d, %d }," % (i, len(mons)))
+        else:
+            party_table.append("{ NULL, 0 },")
+    lines += [
+        "static const struct FixedPathRoomParty gHackPathParties[] =",
+        "{",
+    ]
+    lines += ["    %s" % row for row in party_table]
+    lines += [
+        "};",
+        "",
+    ]
+
+    # Teto de nivel: maior nivel de cada sala de chefe, na ordem do JSON.
+    caps = []
+    for i, (room_type, _, _) in enumerate(entries):
+        if room_type == ROOM_TYPES["boss"]:
+            mons = party_lists[i]
+            caps.append(max(level for _, level in mons) if mons else 0)
+    lines.append("static const u8 gHackPathBossCaps[] = { %s };"
+                 % ", ".join(str(c) for c in caps))
+    lines += [
+        "",
+    ]
+
     # Nomes de area, na ordem do JSON (para o menu de ofertas pendentes).
     for i, name in enumerate(names):
         lines.append('static const u8 sHackPathName%d[] = _("%s");' % (i, c_escape(name)))
@@ -145,6 +194,8 @@ def render(entries, encounter_lists, names):
         "#define HACK_PATH_STEP_COUNT ARRAY_COUNT(gHackPathSteps)",
         "#define HACK_PATH_AREA_COUNT ARRAY_COUNT(gHackPathEncounters)",
         "#define HACK_PATH_NAME_COUNT ARRAY_COUNT(gHackPathAreaNames)",
+        "#define HACK_PATH_PARTY_COUNT ARRAY_COUNT(gHackPathParties)",
+        "#define HACK_PATH_BOSS_COUNT ARRAY_COUNT(gHackPathBossCaps)",
         "",
         "#endif // GUARD_DATA_ROGUE_HACK_PATH_H",
     ]
@@ -155,8 +206,8 @@ def generate(json_path, header_path):
     """Le o JSON e escreve o header."""
     with open(json_path, "r") as f:
         data = json.load(f)
-    entries, encounter_lists, names = parse(data)
-    header = render(entries, encounter_lists, names)
+    entries, encounter_lists, names, party_lists = parse(data)
+    header = render(entries, encounter_lists, names, party_lists)
     header_dir = os.path.dirname(header_path)
     if header_dir:
         os.makedirs(header_dir, exist_ok=True)

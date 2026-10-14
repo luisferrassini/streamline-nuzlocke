@@ -2,6 +2,7 @@
 #include "gba/isagbprint.h"
 #include "rogue.h"
 #include "rogue_fixedpath.h"
+#include "data/rogue/hack_path.h"
 
 void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct RogueAdvPath *out)
 {
@@ -59,4 +60,34 @@ void RogueFixed_FillEncounterSlots(const struct FixedPathRoomEncounters *enc,
         u16 idx = grassCap + i;
         water[i] = (idx < count) ? enc->species[idx] : SPECIES_NONE;
     }
+}
+
+u16 RogueFixed_FillParty(const struct FixedPathRoomParty *party, struct Pokemon *out, u8 capacity)
+{
+    u16 count = (party != NULL) ? party->count : 0;
+    u16 n = count;
+    u16 i;
+
+    // Nao criar mais mons do que cabe no time de destino.
+    if (n > capacity)
+        n = capacity;
+
+    for (i = 0; i < n; ++i)
+        CreateMon(&out[i], party->mons[i].species, party->mons[i].level,
+                  USE_RANDOM_IVS, FALSE, 0, OT_ID_RANDOM_NO_SHINY, 0);
+
+    return n;
+}
+
+u8 RogueFixed_PartyMaxLevel(const struct FixedPathRoomParty *party)
+{
+    u16 count = (party != NULL) ? party->count : 0;
+    u8 max = 0;
+    u16 i;
+
+    for (i = 0; i < count; ++i)
+        if (party->mons[i].level > max)
+            max = party->mons[i].level;
+
+    return max;
 }

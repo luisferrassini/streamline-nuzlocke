@@ -153,9 +153,31 @@
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Route 104 (North)",
-      "encounters": []
+      "encounters": [],
+      "boss": "red1",
+      "party": [
+        {
+          "species": "eevee",
+          "level": 9
+        },
+        {
+          "species": "bulbasaur",
+          "level": 9
+        },
+        {
+          "species": "charmander",
+          "level": 9
+        },
+        {
+          "species": "squirtle",
+          "level": 9
+        },
+        {
+          "species": "pikachu",
+          "level": 9
+        }
+      ]
     },
     {
       "type": "route",
@@ -197,21 +219,99 @@
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Rustboro City",
-      "encounters": []
+      "encounters": [],
+      "boss": "b0",
+      "party": [
+        {
+          "species": "farfetchd",
+          "level": 14
+        },
+        {
+          "species": "plusle",
+          "level": 14
+        },
+        {
+          "species": "nidorino",
+          "level": 16
+        },
+        {
+          "species": "chikorita",
+          "level": 15
+        },
+        {
+          "species": "squirtle",
+          "level": 15
+        },
+        {
+          "species": "combusken",
+          "level": 16
+        }
+      ]
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Rustboro City",
-      "encounters": []
+      "encounters": [],
+      "boss": "r0",
+      "party": [
+        {
+          "species": "farfetchd",
+          "level": 14
+        },
+        {
+          "species": "minun",
+          "level": 14
+        },
+        {
+          "species": "nidorina",
+          "level": 16
+        },
+        {
+          "species": "chikorita",
+          "level": 15
+        },
+        {
+          "species": "squirtle",
+          "level": 15
+        },
+        {
+          "species": "combusken",
+          "level": 16
+        }
+      ]
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Rustboro Gym",
-      "encounters": []
+      "encounters": [],
+      "boss": "1",
+      "party": [
+        {
+          "species": "nosepass",
+          "level": 15
+        },
+        {
+          "species": "lileep",
+          "level": 14
+        },
+        {
+          "species": "anorith",
+          "level": 14
+        },
+        {
+          "species": "relicanth",
+          "level": 14
+        },
+        {
+          "species": "shuckle",
+          "level": 14
+        },
+        {
+          "species": "lunatone",
+          "level": 15
+        }
+      ]
     },
     {
       "type": "route",
@@ -240,15 +340,67 @@
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Mt. Chimney",
-      "encounters": []
+      "encounters": [],
+      "boss": "mt1",
+      "party": [
+        {
+          "species": "dodrio",
+          "level": 37
+        },
+        {
+          "species": "manectric",
+          "level": 37
+        },
+        {
+          "species": "weezing",
+          "level": 37
+        },
+        {
+          "species": "aggron",
+          "level": 38
+        },
+        {
+          "species": "flygon",
+          "level": 37
+        },
+        {
+          "species": "arcanine",
+          "level": 38
+        }
+      ]
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Mt. Chimney",
-      "encounters": []
+      "encounters": [],
+      "boss": "mtmax1",
+      "party": [
+        {
+          "species": "registeel",
+          "level": 38
+        },
+        {
+          "species": "crobat",
+          "level": 39
+        },
+        {
+          "species": "claydol",
+          "level": 39
+        },
+        {
+          "species": "alakazam",
+          "level": 38
+        },
+        {
+          "species": "dusclops",
+          "level": 38
+        },
+        {
+          "species": "houndoom",
+          "level": 39
+        }
+      ]
     },
     {
       "type": "route",
@@ -344,9 +496,35 @@
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Dewford Gym",
-      "encounters": []
+      "encounters": [],
+      "boss": "2",
+      "party": [
+        {
+          "species": "hitmontop",
+          "level": 17
+        },
+        {
+          "species": "hitmonlee",
+          "level": 17
+        },
+        {
+          "species": "hitmonchan",
+          "level": 17
+        },
+        {
+          "species": "meditite",
+          "level": 19
+        },
+        {
+          "species": "poliwrath",
+          "level": 17
+        },
+        {
+          "species": "hariyama",
+          "level": 19
+        }
+      ]
     },
     {
       "type": "route",
@@ -415,15 +593,47 @@
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Mauville City",
-      "encounters": []
+      "encounters": [],
+      "boss": "w1",
+      "party": [
+        {
+          "species": "ralts",
+          "level": 70
+        }
+      ]
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Mauville Gym",
-      "encounters": []
+      "encounters": [],
+      "boss": "3",
+      "party": [
+        {
+          "species": "jolteon",
+          "level": 28
+        },
+        {
+          "species": "lanturn",
+          "level": 28
+        },
+        {
+          "species": "ampharos",
+          "level": 29
+        },
+        {
+          "species": "raichu",
+          "level": 28
+        },
+        {
+          "species": "electabuzz",
+          "level": 28
+        },
+        {
+          "species": "manectric",
+          "level": 29
+        }
+      ]
     },
     {
       "type": "route",
@@ -457,15 +667,67 @@
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Route 110",
-      "encounters": []
+      "encounters": [],
+      "boss": "b1",
+      "party": [
+        {
+          "species": "plusle",
+          "level": 22
+        },
+        {
+          "species": "pidgeotto",
+          "level": 24
+        },
+        {
+          "species": "nidorino",
+          "level": 24
+        },
+        {
+          "species": "bayleef",
+          "level": 24
+        },
+        {
+          "species": "wartortle",
+          "level": 25
+        },
+        {
+          "species": "combusken",
+          "level": 26
+        }
+      ]
     },
     {
       "type": "boss",
-      "trainer": 0,
       "name": "Route 110",
-      "encounters": []
+      "encounters": [],
+      "boss": "r1",
+      "party": [
+        {
+          "species": "minun",
+          "level": 22
+        },
+        {
+          "species": "pidgeotto",
+          "level": 24
+        },
+        {
+          "species": "nidorina",
+          "level": 24
+        },
+        {
+          "species": "bayleef",
+          "level": 24
+        },
+        {
+          "species": "wartortle",
+          "level": 25
+        },
+        {
+          "species": "combusken",
+          "level": 26
+        }
+      ]
     },
     {
       "type": "route",

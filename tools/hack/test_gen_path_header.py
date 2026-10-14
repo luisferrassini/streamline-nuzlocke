@@ -20,7 +20,9 @@ JSON_SAMPLE = """\
       "encounters": ["sunkern", "wingull", "ledyba"] },
     { "type": "route", "difficulty": 0, "name": "Route 102",
       "encounters": ["meowth", "sandshrew"] },
-    { "type": "boss",  "trainer": 0, "encounters": [] }
+    { "type": "boss", "boss": "1", "encounters": [],
+      "party": [ { "species": "geodude", "level": 15 },
+                 { "species": "nosepass", "level": 14 } ] }
 ]}
 """
 
@@ -29,6 +31,16 @@ def _count_entry_lines(text):
     """Conta linhas que abrem uma entrada do array estatico."""
     return sum(1 for line in text.splitlines()
                if "ADVPATH_ROOM_" in line and "{" in line)
+
+
+def _array_block(text, name):
+    """Trecho do array estatico <name> (do marcador ate o '};' final)."""
+    marker = name + "[]"
+    if marker not in text:
+        return ""
+    start = text.index(marker)
+    end = text.index("};", start)
+    return text[start:end]
 
 
 def main():
@@ -70,9 +82,11 @@ def main():
         check("area0 tem sunkern", "SPECIES_SUNKERN" in text)
         check("area1 tem meowth", "SPECIES_MEOWTH" in text)
         check("chefe sem encontros", "{ NULL, 0 }," in text)
-        # Uma linha de entrada do array por sala (3 salas).
-        enc_entries = [line for line in lines
-                       if re.match(r"^\{ (NULL|sHackPathEncounters[0-9]+), [0-9]+ \},$", line)]
+        # Uma linha de entrada do array por sala (3 salas). Isolado por bloco
+        # para nao capturar as linhas vazias da tabela de times.
+        enc_block = _array_block(text, "gHackPathEncounters")
+        enc_entries = [line.strip() for line in enc_block.splitlines()
+                       if re.match(r"^\{ (NULL|sHackPathEncounters[0-9]+), [0-9]+ \},$", line.strip())]
         check("3 entradas no array de encontros", len(enc_entries) == 3)
         check("area0 com 3 encontros", "{ sHackPathEncounters0, 3 }," in lines)
         # A ordem nao pode ser invertida: o chefe (ultima sala) tem 0 encontros.
@@ -84,6 +98,25 @@ def main():
         check("nome da area0", '_("Route 103")' in text)
         check("nome da area1", '_("Route 102")' in text)
         check("nome vazio do chefe", '_("")' in text)
+
+        # Times de chefe (Task 1): uma entrada por sala, na ordem do JSON.
+        check("array de times existe", "gHackPathParties[]" in text)
+        check("contador de times definido", "HACK_PATH_PARTY_COUNT" in text)
+        party_block = _array_block(text, "gHackPathParties")
+        party_entries = [line.strip() for line in party_block.splitlines()
+                         if re.match(r"^\{ (NULL|sHackPathParty[0-9]+), [0-9]+ \},$", line.strip())]
+        check("3 entradas no array de times", len(party_entries) == 3)
+        check("mons do chefe no array estatico", "{ SPECIES_GEODUDE, 15 }" in text)
+        check("mons do chefe no array estatico (2)", "{ SPECIES_NOSEPASS, 14 }" in text)
+        check("sala de chefe referencia o array com count",
+              "{ sHackPathParty2, 2 }," in lines)
+        check("sala sem time fica vazia",
+              party_entries[0] == "{ NULL, 0 }," if party_entries else False)
+
+        # Tetos de nivel por sala de chefe, na ordem do JSON (Task 1).
+        check("array de tetos existe", "gHackPathBossCaps[]" in text)
+        check("contador de tetos definido", "HACK_PATH_BOSS_COUNT" in text)
+        check("teto do primeiro chefe e 15", "gHackPathBossCaps[] = { 15 };" in text)
 
     # Os caminhos padrao (raiz do repo) nao podem cair dentro de tools/.
     repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -118,6 +151,25 @@ def main():
         check("recusa especie desconhecida", False)
     except ValueError:
         check("recusa especie desconhecida", True)
+
+    # Especie desconhecida ou nivel nao inteiro no time deve falhar alto.
+    bad_party_species = {"version": 1,
+                         "rooms": [{"type": "boss",
+                                    "party": [{"species": "nao-existe-xyz", "level": 5}]}]}
+    try:
+        gen_path_header.parse(bad_party_species)
+        check("recusa especie desconhecida no time", False)
+    except ValueError:
+        check("recusa especie desconhecida no time", True)
+
+    bad_party_level = {"version": 1,
+                       "rooms": [{"type": "boss",
+                                  "party": [{"species": "geodude", "level": "abc"}]}]}
+    try:
+        gen_path_header.parse(bad_party_level)
+        check("recusa nivel nao inteiro no time", False)
+    except ValueError:
+        check("recusa nivel nao inteiro no time", True)
 
     if failures:
         print("FALHAS: %d" % failures)

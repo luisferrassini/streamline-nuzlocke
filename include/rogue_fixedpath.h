@@ -19,6 +19,20 @@ struct FixedPathRoomEncounters
     u16 count;
 };
 
+// Um mon do time fixo de uma sala de chefe, vindo do arquivo de dados.
+struct FixedPathPartyMon
+{
+    u16 species; // SPECIES_*
+    u8 level;
+};
+
+// Time fixo de uma sala de chefe, vindo do arquivo de dados.
+struct FixedPathRoomParty
+{
+    const struct FixedPathPartyMon *mons; // NULL se vazio
+    u16 count;
+};
+
 void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct RogueAdvPath *out);
 
 // Preenche os slots de encontro a partir da lista da area.
@@ -27,5 +41,12 @@ void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct R
 void RogueFixed_FillEncounterSlots(const struct FixedPathRoomEncounters *enc,
                                    u16 *grass, u8 grassCap,
                                    u16 *water, u8 waterCap);
+
+// Cria min(count, capacity) mons do time com CreateMon, devolvendo quantos criou.
+// party NULL ou vazio cria 0 mons.
+u16 RogueFixed_FillParty(const struct FixedPathRoomParty *party, struct Pokemon *out, u8 capacity);
+
+// Maior nivel do time; 0 se party NULL ou vazio.
+u8 RogueFixed_PartyMaxLevel(const struct FixedPathRoomParty *party);
 
 #endif // GUARD_ROGUE_FIXEDPATH_H
