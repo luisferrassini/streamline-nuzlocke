@@ -2,6 +2,9 @@
 #include "test/test.h"
 #include "rogue.h"
 #include "rogue_fixedpath.h"
+#include "rogue_controller.h"
+#include "rogue_trainers.h"
+#include "../src/data/rogue/hack_path.h"
 
 static const struct FixedPathStep sSteps[] =
 {
@@ -97,4 +100,21 @@ TEST("RogueFixed_FillParty cria os mons do time")
     EXPECT_EQ(RogueFixed_PartyMaxLevel(&team), 15);
     EXPECT_EQ(RogueFixed_FillParty(NULL, party, 2), 0);
     EXPECT_EQ(RogueFixed_PartyMaxLevel(NULL), 0);
+}
+
+TEST("RogueFixed_CalculateBossMonLvl vem do dado")
+{
+    u16 prev = gRogueRun.currentDifficulty;
+
+    gRogueRun.currentDifficulty = 0;
+    EXPECT_EQ(Rogue_CalculateBossMonLvl(), gHackPathBossCaps[0]);
+
+    gRogueRun.currentDifficulty = 3;
+    EXPECT_EQ(Rogue_CalculateBossMonLvl(), gHackPathBossCaps[3]);
+
+    gRogueRun.currentDifficulty = HACK_PATH_BOSS_COUNT + 5; // fora do dado: nao trava
+    EXPECT(Rogue_CalculateBossMonLvl() >= 1);
+    EXPECT(Rogue_CalculateBossMonLvl() <= MAX_LEVEL);
+
+    gRogueRun.currentDifficulty = prev;
 }

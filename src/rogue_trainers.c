@@ -25,6 +25,8 @@
 #include "rogue_settings.h"
 #include "rogue_trainers.h"
 
+#include "data/rogue/hack_path.h"
+
 #define TRAINER_SHINY_PERC 25
 
 #define RIVAL_BASE_TEAM_DIFFICULTY      ROGUE_ELITE_START_DIFFICULTY - 2
@@ -450,7 +452,12 @@ u8 Rogue_CalculateRivalMonLvl()
 
 u8 Rogue_CalculateBossMonLvl()
 {
-    return CalculateLvlFor(Rogue_GetCurrentDifficulty());
+    u8 difficulty = Rogue_GetCurrentDifficulty();
+
+    if (difficulty < HACK_PATH_BOSS_COUNT && gHackPathBossCaps[difficulty] != 0)
+        return gHackPathBossCaps[difficulty];
+
+    return CalculateLvlFor(difficulty);
 }
 
 u8 Rogue_GetTrainerTypeAssignment(u16 trainerNum)
