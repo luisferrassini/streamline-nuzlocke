@@ -405,6 +405,82 @@ git commit -m "feat: teto de nivel bloqueia o ganho de nivel e o Rare Candy"
 
 ---
 
+### Task 5: Robustez do teto quando o nível cai (não estoura `u8`)
+
+> **Adicionada durante a execução (ruling do controlador, achado do review da Task 2).** A ordem do caminho não é monotônica (o teto cai de 39→19, de 70→29, etc.). `gRogueRun.currentLevelOffset` é `u8` e hoje é calculado como `nextLevel - prevLevel` (`src/rogue_controller.c:7130`); quando o próximo teto é menor, isso estoura (ex.: `19 - 39 = 236`) e faz `Rogue_CalculatePlayerMonLvl()` devolver um teto alto (ex.: 39) em vez do novo teto (19) por dezenas de batalhas. Correção mínima: o offset só cresce quando o teto sobe; as subtrações saturam em 1.
+
+**Files:**
+- Modify: `include/rogue_controller.h` (declarar `Rogue_LevelOffsetForNextBoss`)
+- Modify: `src/rogue_controller.c` (`:7130`)
+- Modify: `src/rogue_trainers.c` (`Rogue_CalculatePlayerMonLvl` `:386`, `Rogue_CalculateTrainerLvlCap` ramo MP `:377`)
+- Test: `test/rogue_levelcap.c`
+
+**Interfaces:**
+- Consumes: `Rogue_CalculateBossMonLvl` (Task 2); `gRogueRun.currentLevelOffset`.
+- Produces:
+  - `u8 Rogue_LevelOffsetForNextBoss(u8 prevLevel, u8 nextLevel);` → `nextLevel > prevLevel ? nextLevel - prevLevel : 0`.
+  - `Rogue_CalculatePlayerMonLvl()` nunca devolve 0 nem estoura: satura em `1` quando `offset >= teto`.
+  - `Rogue_CalculateTrainerLvlCap` (ramo MP `RogueMP_IsActive()`) idem.
+
+- [ ] **Step 1: Escrever os testes que falham**
+
+Em `test/rogue_levelcap.c` (anexar):
+```c
+TEST("Rogue_LevelOffsetForNextBoss nao estoura quando o teto cai")
+{
+    EXPECT_EQ(Rogue_LevelOffsetForNextBoss(9, 16), 7);
+    EXPECT_EQ(Rogue_LevelOffsetForNextBoss(16, 16), 0);
+    EXPECT_EQ(Rogue_LevelOffsetForNextBoss(39, 19), 0);
+}
+
+TEST("Rogue_CalculatePlayerMonLvl satura quando o offset passa do teto")
+{
+    u16 prevDiff = gRogueRun.currentDifficulty;
+    u8 prevOffset = gRogueRun.currentLevelOffset;
+
+    gRogueRun.gameRules.disablePerBadgeLvlCaps = FALSE;
+    gRogueRun.currentDifficulty = 0; // teto do dado = 9
+    gRogueRun.currentLevelOffset = 20;
+    EXPECT(Rogue_CalculatePlayerMonLvl() >= 1);
+    EXPECT(Rogue_CalculatePlayerMonLvl() <= Rogue_CalculateBossMonLvl());
+
+    gRogueRun.currentDifficulty = prevDiff;
+    gRogueRun.currentLevelOffset = prevOffset;
+}
+```
+
+- [ ] **Step 2: Rodar e ver falhar**
+
+Run: `MODERN=1 make -j2 check TESTS="Rogue_LevelCap"`
+Expected: FAIL (`Rogue_LevelOffsetForNextBoss` não existe; `Rogue_CalculatePlayerMonLvl` devolve 245).
+
+- [ ] **Step 3: Implementar**
+
+- Em `src/rogue_controller.c`, adicionar `Rogue_LevelOffsetForNextBoss` e declarar em `include/rogue_controller.h`. Em `:7130`, trocar `nextLevel - prevLevel` por `Rogue_LevelOffsetForNextBoss(prevLevel, nextLevel)`.
+- Em `src/rogue_trainers.c`, saturar as duas subtrações: devolver `1` quando o offset alcança o teto (em `Rogue_CalculatePlayerMonLvl` e no ramo MP de `Rogue_CalculateTrainerLvlCap`).
+
+- [ ] **Step 4: Rodar e ver passar**
+
+Run: `MODERN=1 make -j2 check TESTS="Rogue_LevelCap"`
+Expected: PASS.
+
+- [ ] **Step 5: Build + suíte completa**
+
+Run: `MODERN=1 make -j2 -O all`
+Expected: EXIT=0.
+
+Run: `MODERN=1 make -j2 check`
+Expected: EXIT=0; `FAILED: 0`.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add include/rogue_controller.h src/rogue_controller.c src/rogue_trainers.c test/rogue_levelcap.c
+git commit -m "fix: teto nao estoura o offset quando o proximo chefe e mais fraco"
+```
+
+---
+
 ## Fim do plano
 
 Resultado: cada chefe do caminho luta com o time fixo da referência (espécie + nível); o teto de nível do jogador vem do chefe da área e bloqueia (EXP e itens de nível não passam do teto). Golpes, habilidade e item por chefe ficam para o plano de detalhes dos chefes.
