@@ -18,6 +18,7 @@
 #include "rogue_adventurepaths.h"
 #include "rogue_controller.h"
 #include "rogue_debug.h"
+#include "rogue_fixedpath.h"
 #include "rogue_multiplayer.h"
 #include "rogue_pokedex.h"
 #include "rogue_query.h"
@@ -2134,11 +2135,27 @@ static bool8 ShouldTrainerUseValidTeraTypes(u16 trainerNum)
 u8 Rogue_CreateTrainerParty(u16 trainerNum, struct Pokemon* party, u8 monCapacity, bool8 firstTrainer)
 {
     u8 monCount;
+    bool8 isFixedBossParty = FALSE;
 
-    if(Rogue_IsRivalTrainer(trainerNum))
-        monCount = CreateRivalPartyInternal(trainerNum, party, monCapacity);
-    else
-        monCount = CreateTrainerPartyInternal(trainerNum, party, 0, monCapacity, firstTrainer, 0);
+    // Sala de chefe do caminho fixo: o time vem do dado (especie + nivel),
+    // nao do gerador. Se a area nao tem time fixo, cai no comportamento normal.
+    if(gRogueRun.adventureRoomId < ROGUE_ADVPATH_ROOM_CAPACITY
+       && gRogueAdvPath.rooms[gRogueRun.adventureRoomId].roomType == ADVPATH_ROOM_BOSS)
+    {
+        monCount = RogueFixed_TryCreateBossParty(
+            gRogueAdvPath.rooms[gRogueRun.adventureRoomId].areaIdx, party, monCapacity);
+
+        if(monCount > 0)
+            isFixedBossParty = TRUE;
+    }
+
+    if(!isFixedBossParty)
+    {
+        if(Rogue_IsRivalTrainer(trainerNum))
+            monCount = CreateRivalPartyInternal(trainerNum, party, monCapacity);
+        else
+            monCount = CreateTrainerPartyInternal(trainerNum, party, 0, monCapacity, firstTrainer, 0);
+    }
 
     // Adjust mons
     {
@@ -2175,7 +2192,12 @@ u8 Rogue_CreateTrainerParty(u16 trainerNum, struct Pokemon* party, u8 monCapacit
         monCount = CalculateEnemyPartyCount();
     }
 
-    ReorderPartyMons(trainerNum, party, monCount);
+    // O time fixo do chefe ja vem na ordem do dado. Reordenar reescreveria o
+    // time desenhado, entao pula o reorder em salas de chefe fixas.
+    // AssignAnySpecialMons so escolhe slots de gimmick, sem mexer no time.
+    if(!isFixedBossParty)
+        ReorderPartyMons(trainerNum, party, monCount);
+
     AssignAnySpecialMons(trainerNum, party, monCount);
     
     CalculateEnemyPartyCount();

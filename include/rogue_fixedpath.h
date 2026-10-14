@@ -49,4 +49,8 @@ u16 RogueFixed_FillParty(const struct FixedPathRoomParty *party, struct Pokemon 
 // Maior nivel do time; 0 se party NULL ou vazio.
 u8 RogueFixed_PartyMaxLevel(const struct FixedPathRoomParty *party);
 
+// Cria o time fixo da area areaIdx (se houver) e devolve quantos mons criou.
+// Devolve 0 se areaIdx >= HACK_PATH_PARTY_COUNT ou se a area nao tem time.
+u16 RogueFixed_TryCreateBossParty(u8 areaIdx, struct Pokemon *party, u8 capacity);
+
 #endif // GUARD_ROGUE_FIXEDPATH_H

@@ -1,12 +1,14 @@
 #include "global.h"
 #include "gba/isagbprint.h"
 #include "rogue.h"
+#include "rogue_controller.h"
 #include "rogue_fixedpath.h"
 #include "data/rogue/hack_path.h"
 
 void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct RogueAdvPath *out)
 {
     u16 i;
+    u16 bossCount = 0;
 
     // O gerador (tools/hack/gen_path_header.py) já recusa um caminho maior que
     // isto. O assert torna o limite visível em vez de cortar em silêncio.
@@ -18,6 +20,13 @@ void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct R
     out->pathLength = count;
     out->pathMinY = 0;
     out->pathMaxY = 0;
+
+    // Quantos chefes o caminho tem. O laço abaixo percorre as areas em ordem
+    // inversa (a ultima area do dado cai na sala 0), então este contador
+    // decresce e o valor usado é o ordinal do chefe na ordem de jogo.
+    for (i = 0; i < count; ++i)
+        if (steps[i].roomType == ADVPATH_ROOM_BOSS)
+            ++bossCount;
 
     for (i = 0; i < count; ++i)
     {
@@ -37,9 +46,21 @@ void RogueFixed_BuildPath(const struct FixedPathStep *steps, u16 count, struct R
 
         // perType é uma união: escrever só o campo do tipo da sala.
         if (step->roomType == ADVPATH_ROOM_BOSS)
-            out->rooms[i].roomParams.perType.boss.trainerNum = step->extra;
+        {
+            // Sem treinador fixo no dado (extra == 0), usa o treinador
+            // escolhido para este chefe. O ordinal é o da ordem de jogo.
+            u16 tn = step->extra;
+
+            --bossCount;
+            if (tn == 0 && bossCount < ROGUE_MAX_BOSS_COUNT)
+                tn = gRogueRun.bossTrainerNums[bossCount];
+
+            out->rooms[i].roomParams.perType.boss.trainerNum = tn;
+        }
         else
+        {
             out->rooms[i].roomParams.perType.route.difficulty = step->param;
+        }
     }
 }
 
@@ -90,4 +111,12 @@ u8 RogueFixed_PartyMaxLevel(const struct FixedPathRoomParty *party)
             max = party->mons[i].level;
 
     return max;
+}
+
+u16 RogueFixed_TryCreateBossParty(u8 areaIdx, struct Pokemon *party, u8 capacity)
+{
+    if (areaIdx >= HACK_PATH_PARTY_COUNT || gHackPathParties[areaIdx].count == 0)
+        return 0;
+
+    return RogueFixed_FillParty(&gHackPathParties[areaIdx], party, capacity);
 }
